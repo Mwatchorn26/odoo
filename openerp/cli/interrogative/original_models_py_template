@@ -1,0 +1,84 @@
+# -*- coding: utf-8 -*-
+
+from openerp import models, fields, api
+{% print "Running Model Template" %}
+{% for model in models %}
+{% pprint.pprint(model) %}
+ class {{ model.ModelName|snake }}(models.Model):
+     _name = '{{ model.ModelName|snake }}.{{ model.ModelName|snake }}'
+
+#     name = fields.Char()
+{#
+	{% if not standalone %}
+	‘sequence_field_name’: lambda self: self.env(‘ir.sequence’).get(‘code’) }
+	{% endif -%}
+
+	
+	{% if model.HasStates %}
+	    state = fields.Selection([
+							{% for state in model.modelstates %}
+					    		('{{ state|lower }}','{{ state|title }}'),
+						    {% endfor %}
+						        ], string='Status', default='draft', readonly=True, required=True, copy=False,
+						        help="If event is created, the status is 'Draft'. If event is confirmed for the particular dates the status is set to 'Confirmed'. If the event is over, the status is set to 'Done'. If event is cancelled the status is set to 'Cancelled'.")
+	{% endif %}
+
+	{% if model.HasSequence %}
+		sequence = fields.Integer(string='{{ model.SequenceName|title }}', default=1,
+		help="Gives the sequence of this line when displaying the invoice.")
+	{% endif %}
+	
+
+	{% for field in model.fields %}
+		{% if field.fieldType.lower=="char" %}
+        	{{field.FieldName|snake}} = fields.Char(string='{{field.FieldName|title}}', 
+        								{%- if field.FieldName=="name" -%} required=True,{% endif %} 
+        								{%- if model.HasStates -%} readonly=True, {% if model.HasStates %} states={'draft': [('readonly', False)]}, {% endif %} 
+        								help="TODO: CHAR FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="integer" %}
+            {{field.FieldName|snake}} = fields.Integer(string='{{field.FieldName|title}}', 
+            							{% if model.HasStates %} readonly=True, states={'draft': [('readonly', False)]}, {% endif %} 
+            							help="TODO: INTEGER FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="text" %}
+            {{field.FieldName|snake}} = fields.Text(string='{{field.FieldName|title}}', 
+            							{% if model.HasStates %} readonly=True, states={'draft': [('readonly', False)]}, {% endif %} 
+            							help="TODO: TEXT FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="date" %}
+            {{field.FieldName|snake}} = fields.Date(string='{{field.FieldName|title}}', 
+            							{% if model.HasStates %} readonly=True, states={'draft': [('readonly', False)]}, {% endif %} 
+            							help="TODO: DATE FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="float" %}
+            {{field.FieldName|snake}} = fields.Float(string='{{field.FieldName|title}}', 
+            							{% if model.HasStates %} readonly=True, states={'draft': [('readonly', False)]}, {% endif %} 
+            							help="TODO: FLOAT FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="boolean" %}
+            {{field.FieldName|snake}} = fields.Boolean(string='{{field.FieldName|title}}', 
+            							{% if model.HasStates %} readonly=True, states={'draft': [('readonly', False)]}, {% endif %} 
+            							help="TODO: BOOLEAN FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="many2many" %}
+        	{{field.FieldName|snake}} = fields.Many2many(string='{{field.FieldName|title}}',
+        								{% if model.HasStates %}  
+        								help="TODO: FLOAT MANY2MANY HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="one2many" %}
+        	{{field.FieldName|snake}} = fields.One2many(comodel_name=’res.users’, inverse_name=’rel_id’, 
+        								string='{{field.FieldName|title}}', 
+        								help="TODO: ONE2MANY FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="many2one" %}
+        	{{field.FieldName|snake}} = fields.Many2one(comodel_name=’res.partner’, 
+        								string='{{field.FieldName|title}}', 
+        								help="TODO: MANY2ONE FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% elif field.fieldType.lower=="selection" %}
+        	{{field.FieldName|snake}} = fields.Selection([
+							        	{% for selection in field.selections %}
+							        		('{{ selection|snake }}','{{selection|title}}'),
+							        	{% endfor %}
+        								], 
+        								string='{{field.FieldName|title}}', 
+        								help="TODO: SELECTION FIELD HELP THIS SHOULD BE CREATED INTERACTIVELY")
+        {% endif %}
+
+{{field.FieldName}}
+
+    {% endfor %}
+#}    
+ {% endfor %} 
