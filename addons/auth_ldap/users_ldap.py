@@ -228,6 +228,7 @@ class CompanyLDAP(osv.osv):
                  "otherwise all authentication attempts will fail."),
     }
     _defaults = {
+        'ldap_protocol': 'ldap',
         'ldap_server': '127.0.0.1',
         'ldap_server_port': 389,
         'sequence': 10,
