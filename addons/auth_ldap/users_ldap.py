@@ -69,7 +69,7 @@ class CompanyLDAP(osv.osv):
         :return: an LDAP object
         """
 
-        uri = 'ldap://%s:%d' % (conf['ldap_server'],
+        uri = '%s://%s:%d' % (conf['ldap_protocol'],conf['ldap_server'],
                                 conf['ldap_server_port'])
 
         connection = ldap.initialize(uri)
@@ -102,7 +102,7 @@ class CompanyLDAP(osv.osv):
 
             # Get rid of (None, attrs) for searchResultReference replies
             results = [i for i in results if i[0]]
-            if results and len(results) == 1:
+            if results and len(results) >= 1:
                 dn = results[0][0]
                 conn = self.connect(conf)
                 conn.simple_bind_s(dn, password.encode('utf-8'))
@@ -206,6 +206,8 @@ class CompanyLDAP(osv.osv):
         'sequence': fields.integer('Sequence'),
         'company': fields.many2one('res.company', 'Company', required=True,
             ondelete='cascade'),
+        'ldap_protocol': fields.selection([('ldap','ldap'),('ldaps','ldaps')], 
+            help=("Select regular or secure ldap (ldaps)")),
         'ldap_server': fields.char('LDAP Server address', required=True),
         'ldap_server_port': fields.integer('LDAP Server port', required=True),
         'ldap_binddn': fields.char('LDAP binddn', 
