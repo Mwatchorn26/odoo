@@ -52,7 +52,7 @@ class CompanyLDAP(osv.osv):
             id_clause = ''
             args = []
         cr.execute("""
-            SELECT id, company, ldap_server, ldap_server_port, ldap_binddn,
+            SELECT id, company, ldap_protocol, ldap_server, ldap_server_port, ldap_binddn,
                    ldap_password, ldap_filter, ldap_base, "user", create_user,
                    ldap_tls
             FROM res_company_ldap
